@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,6 +29,7 @@ public class BuildTool : Editor
     {
         List<AssetBundleBuild> assetBundleBuilds = new List<AssetBundleBuild>();
 
+        List<string> bundleInfos = new List<string>();
         //查找需要打包的文件
         string[] files = Directory.GetFiles(PathUtil.BuildResourcesPath, "*", SearchOption.AllDirectories);
 
@@ -45,11 +47,41 @@ public class BuildTool : Editor
             string bundleName = files[i].Replace(PathUtil.BuildResourcesPath, "").ToLower();
             assetBundle.assetBundleName = bundleName + ".ab";
             assetBundleBuilds.Add(assetBundle);
+            
+            //添加文件和依赖信息
+            List<string> dependenceInfo = GetDependence(assetName);
+            string bundleInfo = assetName + "|" + bundleName + ".ab";
+
+            if (dependenceInfo.Count > 0)
+                bundleInfo = bundleInfo + "|" + string.Join("|", dependenceInfo);
+
+            bundleInfos.Add(bundleInfo);
+            
         }
+
 
         if (Directory.Exists(PathUtil.BundleOutPath))
             Directory.Delete(PathUtil.BundleOutPath, true);
+
         Directory.CreateDirectory(PathUtil.BundleOutPath);
+
         BuildPipeline.BuildAssetBundles(PathUtil.BundleOutPath, assetBundleBuilds.ToArray(), BuildAssetBundleOptions.None, target);
+
+        File.WriteAllLines(PathUtil.BundleOutPath + "/" + AppConst.FileListName, bundleInfos);
+
+        AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 获取依赖文件列表
+    /// </summary>
+    /// <param name="curFile"></param>
+    /// <returns></returns>
+    static List<string> GetDependence(string curFile)
+    {
+        List<string> dependence = new List<string>();
+        string[] files = AssetDatabase.GetDependencies(curFile);
+        dependence = files.Where(file => !file.EndsWith(".cs") && !file.Equals(curFile)).ToList();
+        return dependence;
     }
 }
