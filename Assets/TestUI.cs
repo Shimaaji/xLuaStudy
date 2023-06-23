@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TestUI : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class TestUI : MonoBehaviour
     void Start()
     {
         //ResourceManager.LoadAsset("Assets/BuildResource/UI/Prefabs/TestUI.prefab", OnComplete);
+        
+        
     }
 
     private void OnComplete(UnityEngine.Object obj)

@@ -17,6 +17,9 @@ public class ResourceManager : MonoBehaviour
     //存放bundle信息的集合
     private Dictionary<string, BundleInfo> m_BundleInfos = new Dictionary<string, BundleInfo>();
 
+    //存放Bundle资源的集合
+    private Dictionary<string, AssetBundle> m_AssetBundles = new Dictionary<string, AssetBundle>();
+
     /// <summary>
     /// 解析版本文件
     /// </summary>
@@ -38,6 +41,11 @@ public class ResourceManager : MonoBehaviour
                 bundleInfo.Dependences.Add(info[j]);
             }
             m_BundleInfos.Add(bundleInfo.AssetsName, bundleInfo);
+
+            if (info[0].IndexOf("LuaScripts") > 0)
+            {
+                Manager.Lua.LuaNames.Add(info[0]);
+            }
         }
     }
 
@@ -52,18 +60,31 @@ public class ResourceManager : MonoBehaviour
         string bundleName = m_BundleInfos[assetName].BundleName;
         string bundlePath = Path.Combine(PathUtil.BundleResourcePath, bundleName);
         List<string> dependences = m_BundleInfos[assetName].Dependences;
-        if (dependences != null && dependences.Count > 0)
+
+        AssetBundle bundle = GetBundle(bundleName);
+        if (bundle == null)
         {
-            for (int i = 0; i < dependences.Count; i++)
+            if (dependences != null && dependences.Count > 0)
             {
-                yield return LoadBundleAsync(dependences[i]);
+                for (int i = 0; i < dependences.Count; i++)
+                {
+                    yield return LoadBundleAsync(dependences[i]);
+                }
             }
+
+            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(bundlePath);
+            yield return request;
+            bundle = request.assetBundle;  
+            m_AssetBundles.Add(bundleName, bundle);
         }
 
-        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(bundlePath);
-        yield return request;
+        if (assetName.EndsWith(".unity"))
+        {
+            action?.Invoke(null);
+            yield break;
+        }
 
-        AssetBundleRequest bundleRequest = request.assetBundle.LoadAssetAsync(assetName);
+        AssetBundleRequest bundleRequest = bundle.LoadAssetAsync(assetName);
         yield return bundleRequest;
 
         Debug.Log("LoadBundleAsync");
@@ -78,6 +99,21 @@ public class ResourceManager : MonoBehaviour
         */
     }
 
+    AssetBundle GetBundle(string name)
+    {
+        AssetBundle bundle = null;
+        if (m_AssetBundles.TryGetValue(name, out bundle))
+            return bundle;
+        return null;
+    }
+
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// 编辑器环境加载资源
+    /// </summary>
+    /// <param name="assetName"></param>
+    /// <param name="action"></param>
     void EditorLoadAsset(string assetName, Action<UObject> action = null)
     {
         Debug.Log("Editor  Mode");
@@ -88,18 +124,17 @@ public class ResourceManager : MonoBehaviour
         }
         action?.Invoke(obj);
     }
+#endif
 
 
     private void LoadAsset(string assetName,Action<UObject> action)
     {
+#if UNITY_EDITOR
         if (AppConst.GameMode == GameMode.EditorMode)
-        {
             EditorLoadAsset(assetName, action);
-        }
         else
-        {
+#endif
             StartCoroutine(LoadBundleAsync(assetName, action));
-        }
     }
 
     public void LoadUI(string assetName, Action<UObject> action = null)
@@ -122,4 +157,13 @@ public class ResourceManager : MonoBehaviour
     {
         LoadAsset(PathUtil.GetScenePath(assetName), action);
     }
+    public void LoadLua(string assetName, Action<UObject> action = null)
+    {
+        LoadAsset(assetName, action);
+    }
+    public void LoadPrefab(string assetName, Action<UObject> action = null)
+    {
+        LoadAsset(assetName, action);
+    }
+
 }

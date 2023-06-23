@@ -6,15 +6,27 @@ public class GameStart : MonoBehaviour
 {
     public GameMode GameMode;
 
-    void Awake()
+    void Start()
     {
+        Manager.Event.Subscribe(10000, OnLuaInit);
+
         AppConst.GameMode = this.GameMode;
         DontDestroyOnLoad(this);
+
+        Manager.Resource.ParseVersionFile();
+        Manager.Lua.Init();
+
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnLuaInit(object args)
     {
-        
+        Manager.Lua.StartLua("main");
+        XLua.LuaFunction func = Manager.Lua.LuaEnv.Global.Get<XLua.LuaFunction>("Main");
+        func.Call();
+    }
+
+    void OnApplicationQuit()
+    {
+        Manager.Event.UnSubscribe(10000, OnLuaInit);
     }
 }
