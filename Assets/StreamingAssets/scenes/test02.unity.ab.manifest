@@ -1,0 +1,46 @@
+ManifestFileVersion: 0
+CRC: 2514023980
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 9d9da73417d7c97b789845a528c80c80
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 37f7279099ea8016ef6c6f31f888c297
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 104
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 157
+  Script: {instanceID: 0}
+- Class: 196
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/BuildResources/Scenes/Test02.unity
+Dependencies:
+- E:/UnityProject/xLuaStudy/Assets/StreamingAssets/model/mat/test02.mat.ab

@@ -1,0 +1,19 @@
+ManifestFileVersion: 0
+CRC: 2873847911
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 9d519f5de32a647e077b96b34353233f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 12da798fbf3a6c0c342cc56cb1a6efdf
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/BuildResources/UI/Res/FIGZslVaMAQVPAV.jpg
+Dependencies: []
